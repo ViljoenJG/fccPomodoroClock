@@ -1,67 +1,134 @@
-const defaultTimer = 25;
-const defaultRest = 5;
+const DEFAULT_TIMER = 25;
+const DEFAULT_REST = 5;
+const RUNNING_INTERVAL = 100;
+const MILLIS_PER_HOUR = (1000*60*60);
+const MILLIS_PER_MINUTE = (1000*60);
+const MILLIS_PER_SECOND = 1000;
 
-let timerMinutes = defaultTimer;
-let restMinutes = defaultRest;
+let timerMinutes = DEFAULT_TIMER;
+let restMinutes = DEFAULT_REST;
 let timer = null;
+let isTimer = true;
+let isRunning = false;
+let timeLeft = null;
 
-function startTimer() {
-    const timerStartTime = Date.now();
-    timer = setTimeout(updateTimer, 100, timerStartTime, true);
+function toggle() {
+    if (isRunning) {
+        window.clearInterval(timer);
+        isRunning = false;
+    } else {
+        isRunning = true;
+
+        if (isTimer) {
+            startTimer(true, timerMinutes);
+        } else {
+            startTimer(false, restMinutes);
+        }
+    }
 }
 
-function startRest() {
-    const restStartTime = Date.now();
-    timer = setTimeout(updateTimer, 100, restStartTime, false);
+function startTimer(timerMode, time) {
+    timeLeft = (timeLeft !== null) ? timeLeft : time * 60000;
+    document.getElementById('timerName').innerText = (timerMode) ? 'Timer' : 'Rest';
+    timer = setInterval(updateTimer, RUNNING_INTERVAL);
 }
 
 function resetClock() {
+    isTimer = true;
+    timeLeft = null;
     window.clearTimeout(timer);
-    timerMinutes = defaultTimer;
-    restMinutes = defaultRest;
-
-    document.getElementById('minutes').innerText = '' + defaultTimer;
-    document.getElementById('seconds').innerText = '00';
-    document.getElementById('time').innerText = '' + timerMinutes;
-    document.getElementById('rest').innerText = '' + restMinutes;
+    document.getElementById('timeLeft').innerText = timerMinutes + '-' + restMinutes;
+    document.getElementById('timerName').innerText = 'Timer';
 }
 
-function updateTimer(startTime, isTimer) {
-    let diff = Date.now() - startTime;
-    let minutesDiff = Math.ceil(diff / 60000);
-    let secondsDiff = Math.ceil((diff % 60000) / 1000);
+function resetDefaults() {
+    isTimer = true;
+    timeLeft = null;
+    window.clearTimeout(timer);
+    timerMinutes = DEFAULT_TIMER;
+    restMinutes = DEFAULT_REST;
 
-    let minuteVal = (isTimer)
-        ? timerMinutes - minutesDiff : restMinutes - minutesDiff;
+    document.getElementById('timeLeft').innerText = DEFAULT_TIMER + '-' + DEFAULT_REST;
+    document.getElementById('time').innerText = '' + timerMinutes;
+    document.getElementById('rest').innerText = '' + restMinutes;
+    document.getElementById('timerName').innerText = 'Timer';
+}
 
-    let secondsVal = (60 - secondsDiff < 10)
-        ? '0' + (60 - secondsDiff) : 60 - secondsDiff;
+function updateTimer() {
+    timeLeft -= RUNNING_INTERVAL;
 
-    minuteVal = (minuteVal <= 0) ? minuteVal = '00' : minuteVal;
-    secondsVal = (secondsVal <= 0) ? secondsVal = '00' : secondsVal;
+    if (timeLeft <= 0) {
+        window.clearTimeout(timer);
+        timeLeft = null;
+        isTimer = !isTimer;
 
-    document.getElementById('minutes').innerText = '' + minuteVal;
-    document.getElementById('seconds').innerText = '' + secondsVal;
-
-    if (minuteVal == '00' && secondsVal == '00') {
         if (isTimer) {
-            startRest();
+            startTimer(true, timerMinutes);
         } else {
-            startTimer();
+            startTimer(false, restMinutes);
         }
 
         return;
     }
 
-    timer = setTimeout(updateTimer, 100, startTime, isTimer);
+    document.getElementById('timeLeft').innerText = getTimeFromMillis(timeLeft);
+}
+
+function getTimeFromMillis(millis) {
+    let hours, minutes, seconds = null;
+    let time = '';
+
+    hours = (millis >= MILLIS_PER_HOUR)
+        ? Math.floor(millis / MILLIS_PER_HOUR)
+        : null;
+
+    minutes = (millis >= MILLIS_PER_MINUTE)
+        ? Math.floor((millis % MILLIS_PER_HOUR) / MILLIS_PER_MINUTE)
+        : null;
+
+    seconds = (millis >= MILLIS_PER_SECOND)
+        ? Math.floor((millis % MILLIS_PER_MINUTE) / MILLIS_PER_SECOND)
+        : null;
+
+    time += (hours !== null) ? hours + ':' : '';
+
+    time += (minutes !== null)
+        ? (hours !== null && minutes < 10) ? '0' + minutes + ':' : minutes + ':'
+        : '0:';
+
+    time += (seconds !== null)
+        ? (seconds < 10) ? '0' + seconds : seconds
+        : '00';
+
+    return time;
 }
 
 function changeTimer(val) {
+    if (val < 0 && timerMinutes == 1) {
+        return;
+    }
+
     timerMinutes += val;
     document.getElementById('time').innerText = '' + timerMinutes;
+
+    if (isTimer && timeLeft !== null && timeLeft > 0) {
+        timeLeft += val * 60000;
+    } else if (timeLeft == null) {
+        document.getElementById('timeLeft').innerText = timerMinutes + '-' + restMinutes;
+    }
 }
 
 function changeRest(val) {
+    if (val < 0 && restMinutes == 1) {
+        return;
+    }
+
     restMinutes += val;
     document.getElementById('rest').innerText = '' + restMinutes;
+
+    if (!isTimer && timeLeft !== null && timeLeft > 0) {
+        timeLeft += val * 60000;
+    } else if (timeLeft == null) {
+        document.getElementById('timeLeft').innerText = timerMinutes + '-' + restMinutes;
+    }
 }

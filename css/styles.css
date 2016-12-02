@@ -1,17 +1,18 @@
 html {
+    font-family: 'Montserrat', sans-serif;
     background-color: white;
     text-align: center;
 }
 
 h1 {
+    font-family: 'Montserrat', sans-serif;
     text-align: center;
-    font-size: 60px;
+    font-size: 44px;
 }
 
 .clock {
+    cursor: pointer;
     text-align: center;
-    font-family: sans-serif;
-    font-size: 72px;
     font-weight: bold;
     width: 300px;
     height: 300px;
@@ -20,14 +21,22 @@ h1 {
     border-radius: 150px;
 }
 
+.timeLeft {
+    font-size: 72px;
+}
+
+.timerName {
+    font-size: 54px;
+}
+
 .time {
-    margin-top: 100px;
+    margin-top: 50px;
     position: relative;
 }
 
 .controls {
     font-size: 24px;
-    width: 220px;
+    width: 280px;
     margin: 0 auto;
 }
 

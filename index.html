@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Pomodoro Clock</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
@@ -24,18 +25,22 @@
             </div>
         </div>
 
-        <div class="clock">
+        <div class="clock" onclick="toggle()">
             <div class="time">
-                <span id="minutes">25</span>:<span id="seconds">00</span><br>
+                <span class="timerName" id="timerName">Timer</span><br>
+                <span class="timeLeft" id="timeLeft">25-5</span>
             </div>
         </div>
 
         <div class="buttons">
-            <button class="start btn" onclick="startTimer()">
-                Start
+            <button class="start btn" onclick="toggle()">
+                Start/Pause
             </button>
             <button class="reset btn" onclick="resetClock()">
                 Reset
+            </button>
+            <button class="reset btn" onclick="resetDefaults()">
+                Defaults
             </button>
         </div>
     </div>
