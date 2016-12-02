@@ -1,0 +1,15 @@
+html {
+    background-color: white;
+}
+
+.clock {
+    font-family: sans-serif;
+    font-size: 72px;
+    font-weight: bold;
+    width: 400px;
+    height: 400px;
+    padding: 130px 0;
+    margin: 60px auto 0;
+    border: 5px solid;
+    border-radius: 200px;
+}
